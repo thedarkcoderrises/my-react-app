@@ -1,21 +1,18 @@
 // /client/App.js
 import React, { Component } from 'react';
+import Table from './Table';
 import axios from 'axios';
 
 class App extends Component {
-  state = {
-    data: [],
-    intervalIsSet: false
-  };
 
-  componentWillUnmount() {
-    if (this.state.intervalIsSet) {
-      clearInterval(this.state.intervalIsSet);
-      this.setState({ intervalIsSet: null });
+constructor(props){
+      super(props);
+      this.state={
+        tableData:[]
+      }
     }
-  }
 
-  getDataFromDb = () => {
+getDataFromDb = () => {
   axios.post("http://localhost:8081/graphql", {
     query: `query {
       persons{
@@ -30,34 +27,30 @@ class App extends Component {
         'Content-Type': 'application/json'
       }
     })
-    .then((res) => this.setState({ data: res.data }));
+    .then((res) => this.setState({ tableData: res.data.data.persons }));
   };
 
-
-  // here is our UI
-  // it is easy to understand their functions when you
-  // see them render into our screen
-  render() {
-    const { data } = this.state;
-
+render() {
     return (
-      <div>
-      <ul>
-                {data.length <= 0? 'Click GET to pull data from Mongo'
-                  :
-                  <pre>
-                  {JSON.stringify(data.data.persons,null,2)}
-                  </pre>
-                  }
-              </ul>
-        <div style={{ padding: '10px' }}>
-                  <button onClick={() => this.getDataFromDb()}>
-                    GET
-                  </button>
-                </div>
+      <div className="App">
+        Hello, React <br/>
+        Person Information <br/><br/>
+          {
+              this.state.tableData.length <= 0?
+              'GET Person info from Mongo':<Table data={this.state.tableData}/>
+           }
+
+        <div style={{ padding: '5px' }}>
+          <button onClick={() => this.getDataFromDb()}>
+            GET
+          </button>
+        </div>
       </div>
+
     );
-  }
+}
+
 }
 
 export default App;
+
